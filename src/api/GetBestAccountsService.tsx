@@ -10,12 +10,13 @@ export async function getAccounts(isPersonalAccount: boolean, typeAccount: strin
   if(isPersonalAccount) {
     url = personalAccountUrl
   }
-    return await axios.get(url, {params: {'typeAccount': typeAccount}})
-    .then((response) => {
-      console.log(response.data);
-      return response.data
-    })
-    .catch((error) => {
-      console.log(error)
-    })
+  console.log('Requesting: ' + url + "/?'typeAccount': " + typeAccount)
+  return await axios.get(url, {params: {'typeAccount': typeAccount}})
+  .then((response) => {
+    console.log(response.data);
+    return response.data
+  })
+  .catch((error) => {
+    console.log(error)
+  })
 }

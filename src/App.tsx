@@ -1,12 +1,14 @@
 import './App.css';
 import {  Select } from '@mantine/core';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Container,
-  useMantineTheme,
   Table,
   Image,
-  Button
+  Button, 
+  Box,
+  Grid,
+  Center
 } from '@mantine/core';
 import { createStyles } from '@mantine/core';
 import { getAccounts } from './api/GetBestAccountsService';
@@ -14,7 +16,6 @@ import { getAccounts } from './api/GetBestAccountsService';
 const useStyles = createStyles((theme, _params, getRef) => ({
   wrapper: {
     // subscribe to color scheme changes right in your styles
-    backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[1],
     width: '100%',
     height: '100%',
     display: 'flex',
@@ -44,16 +45,6 @@ const useStyles = createStyles((theme, _params, getRef) => ({
   },
 }));
 
-const elements = [
-  { customerFriendlyLogoUri: 'https://images.unsplash.com/photo-1511216335778-7cb8f49fa7a3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80', bank: 'teste', bundleName: 'C', minimum: 'Carbon', maximum: '1' },
-  { customerFriendlyLogoUri: 'https://images.unsplash.com/photo-1511216335778-7cb8f49fa7a3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80', bank: 'teste2', bundleName: 'C', minimum: 'Carbon', maximum: '1' },
-  { customerFriendlyLogoUri: 'https://images.unsplash.com/photo-1511216335778-7cb8f49fa7a3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80', bank: 'teste3', bundleName: 'C', minimum: 'Carbon', maximum: '1' },
-  { customerFriendlyLogoUri: 'https://images.unsplash.com/photo-1511216335778-7cb8f49fa7a3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80', bank: 'teste4', bundleName: 'C', minimum: 'Carbon', maximum: '1' },
-  { customerFriendlyLogoUri: 'https://images.unsplash.com/photo-1511216335778-7cb8f49fa7a3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80', bank: 'teste5', bundleName: 'C', minimum: 'Carbon', maximum: '1' },
-];
-
-var accountsData: any[] = []
-
 function App() {  
   
   const { classes } = useStyles();
@@ -61,23 +52,29 @@ function App() {
   const [typeAccount, setTypeAccount] = useState([])
   const [accountFilter, setAccountFilter] = useState([])
 
-  const rows = accountsData.map((element) => (
-    <tr key={element[1]}>
+
+  const rows = accounts.map(( { bank, bundleName, customerFriendlyLogoUri, minimum, maximum }) => (
+    <tr>
       <td>
-        <div style={{ width: 100}}>
           <Image
                 radius="md"
-                src={element[0]}
+                width={70}
+                height={50}
+                fit="contain"
+                src={customerFriendlyLogoUri}
                 alt="Random unsplash image"
           />
-        </div>
       </td>
-      <td>{element[1]}</td>
-      <td>{element[2]}</td>
-      <td>{element[3]}</td>
-      <td>{element[4]}</td>
+      <td>{bank}</td>
+      <td>{bundleName}</td>
+      <td>{minimum}</td>
+      <td>{maximum}</td>
     </tr>
   ));
+
+  const searchBestAccounts = async () => {
+    setAccounts(await getAccounts(`${typeAccount}` === 'PERSONAL', `${accountFilter}`))
+   }
 
   return (
     <>
@@ -89,33 +86,40 @@ function App() {
     </div>
 
     <div className={classes.wrapper}>
-      
-      
       <Container className={classes.child}>
-          <Select
-            label="Tipo da Conta"
-            placeholder="Selecione"
-            value={typeAccount} 
-            onChange={setTypeAccount}
-            data={[
-              { value: 'PERSONAL', label: 'Pessoa Fisica' },
-              { value: 'BUSINESS', label: 'Pessoa Juridica' },
-            ]}
-          />
-          <Select
-            label="Filtro"
-            placeholder="Selecione"
-            value={accountFilter} 
-            onChange={setAccountFilter}
-            data={[
-              { value: 'CONTA_DEPOSITO_A_VISTA', label: 'Conta Corrente' },
-              { value: 'CONTA_POUPANCA', label: 'Conta Poupança' },
-              { value: 'CONTA_PAGAMENTO_PRE_PAGA', label: 'Conta Pré Paga' },
-            ]}
-          />
-        <Button onClick={searchBestAccounts()}>
-            Search
-        </Button>
+        <Grid>
+          <Grid.Col span={12}>
+              <Select
+                label="Tipo da Conta"
+                placeholder="Selecione"
+                value={typeAccount} 
+                onChange={setTypeAccount}
+                data={[
+                  { value: 'PERSONAL', label: 'Pessoa Fisica' },
+                  { value: 'BUSINESS', label: 'Pessoa Juridica' },
+                ]}
+              />
+              <Select
+                label="Filtro"
+                placeholder="Selecione"
+                value={accountFilter} 
+                onChange={setAccountFilter}
+                data={[
+                  { value: 'CONTA_DEPOSITO_A_VISTA', label: 'Conta Corrente' },
+                  { value: 'CONTA_POUPANCA', label: 'Conta Poupança' },
+                  { value: 'CONTA_PAGAMENTO_PRE_PAGA', label: 'Conta Pré Paga' },
+                ]}
+              />
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <Center>
+              <Button onClick={searchBestAccounts}>
+                  Search
+              </Button>
+            </Center>
+          </Grid.Col>
+
+        </Grid>
         <Table striped>
           <thead>
             <tr>
@@ -130,16 +134,19 @@ function App() {
         </Table>
       </Container>
    </div>
+  <div className='light x1'></div>
+  <div className='light x2'></div>
+  <div className='light x3'></div>
+  <div className='light x4'></div>
+  <div className='light x5'></div>
+  <div className='light x6'></div>
+  <div className='light x7'></div>
+  <div className='light x8'></div>
+  <div className='light x9'></div>
    </>
   );
 
 
 }
-
-async function searchBestAccounts() {
-  accountsData = await getAccounts(true, 'CONTA_DEPOSITO_A_VISTA')
- }
-
-
 
 export default App;
