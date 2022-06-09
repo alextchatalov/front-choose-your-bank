@@ -1,20 +1,26 @@
 import axios from 'axios'
 
-const personalAccountUrl = 'http://localhost:8081/api/v1/personal-accounts/best/service-bundle'
-const businessAccountUrl = 'http://localhost:8081/api/v1/business-accounts/best/service-bundle'
+const url = 'http://localhost:8081/graphql'
 
-export async function getAccounts(isPersonalAccount: boolean, typeAccount: string) {
+export async function getAccounts(typeAccount: string, accountModel: string, ) {
 
-  var url = businessAccountUrl
+  console.log(accountModel)
 
-  if(isPersonalAccount) {
-    url = personalAccountUrl
-  }
-  console.log('Requesting: ' + url + "/?'typeAccount': " + typeAccount)
-  return await axios.get(url, {params: {'typeAccount': typeAccount}})
-  .then((response) => {
+  return await axios.post(url, {
+    query: `
+    query {
+      getBestTopFiveBundleFromAccount(type: `+ typeAccount +`, accountModel: `+ accountModel +`) {
+        bank,
+        bundleName,
+        customerFriendlyLogoUri,
+        minimum,
+        maximum
+      }
+    }
+  `
+  }).then((response) => {
     console.log(response.data);
-    return response.data
+    return response.data.data.getBestTopFiveBundleFromAccount
   })
   .catch((error) => {
     console.log(error)

@@ -73,7 +73,7 @@ function App() {
   ));
 
   const searchBestAccounts = async () => {
-    setAccounts(await getAccounts(`${typeAccount}` === 'PERSONAL', `${accountFilter}`))
+    setAccounts(await getAccounts(`${typeAccount}`, `${accountFilter}`))
    }
 
   return (
