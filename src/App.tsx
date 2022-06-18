@@ -5,13 +5,19 @@ import {
   Container,
   Table,
   Image,
-  Button, 
-  Box,
+  Button,
   Grid,
   Center
 } from '@mantine/core';
 import { createStyles } from '@mantine/core';
 import { getAccounts } from './api/GetBestAccountsService';
+import {
+  BrowserRouter as Router,
+  Link,
+  Route,
+  Routes
+} from "react-router-dom";
+import Detail from './Detail';
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   wrapper: {
@@ -52,9 +58,8 @@ function App() {
   const [typeAccount, setTypeAccount] = useState([])
   const [accountFilter, setAccountFilter] = useState([])
 
-
-  const rows = accounts.map(( { bank, bundleName, customerFriendlyLogoUri, minimum, maximum }) => (
-    <tr>
+  const rows = accounts.map(( { bank, bundleName, customerFriendlyLogoUri, minimum, maximum, id }) => (
+    <tr key={id}>
       <td>
           <Image
                 radius="md"
@@ -69,16 +74,21 @@ function App() {
       <td>{bundleName}</td>
       <td>{minimum}</td>
       <td>{maximum}</td>
+      <td>
+       <Link to={`/detail/${id}/${bundleName}`}>
+        Detalhes
+       </Link>
+      </td>
     </tr>
   ));
 
   const searchBestAccounts = async () => {
     setAccounts(await getAccounts(`${typeAccount}`, `${accountFilter}`))
-   }
+  }
 
   return (
     <>
-
+    <Router>
     <div className={classes.wrapper}>
       <Container className={classes.child}>
         text
@@ -128,6 +138,7 @@ function App() {
               <th>Pacote</th>
               <th>Valor Minimo</th>
               <th>Valor Maximo</th>
+              <th> Detalhes do Pacote</th>
             </tr>
           </thead>
           <tbody>{rows}</tbody>
@@ -143,10 +154,15 @@ function App() {
   <div className='light x7'></div>
   <div className='light x8'></div>
   <div className='light x9'></div>
+   <Routes>
+      <Route path='/detail/:id/:bundleName' element={<Detail/>} />
+    </Routes>
+  </Router>
    </>
+   
   );
 
-
+  
 }
 
 export default App;
